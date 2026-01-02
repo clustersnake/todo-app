@@ -53,7 +53,7 @@ export const UserTasksView = () => {
     }
   };
 
-  const deleteTask = async (taskId: number) => {
+  const deleteTask = async (taskId: number | undefined) => {
     if (!window.confirm("¿Estás seguro de eliminar esta tarea?")) return;
 
     try {
