@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Todo.Application.Interfaces;
 using Todo.Domain.Entities;
 
@@ -5,24 +6,54 @@ namespace Todo.Application.Services;
 
 public class TaskService : ITaskService
 {
-    public Task<TaskEntity> CreateTaskAsync(TaskEntity task)
+
+    private readonly IApplicationDbContext _context;
+
+    public TaskService(IApplicationDbContext context)
     {
-        // El test fallará aquí con esta excepción
-        throw new NotImplementedException("Fase Rojo: El método de creación no está implementado.");
+        _context = context;
+    }
+    public async Task<TaskEntity> CreateTaskAsync(TaskEntity task)
+    {
+        task.CreatedAt = DateTime.UtcNow;
+        task.UpdatedAt = DateTime.UtcNow;
+        _context.Tasks.Add(task);
+        await _context.SaveChangesAsync();
+        return task;
     }
 
-    public Task<IEnumerable<TaskEntity>> GetTasksByUserIdAsync(int userId)
+    public async Task<IEnumerable<TaskEntity>> GetTasksByUserIdAsync(int userId)
     {
-        throw new NotImplementedException("Fase Rojo: El método de consulta no está implementado.");
+        return await _context.Tasks
+    .Where(t => t.UserId == userId && !t.Deleted)
+    .ToListAsync();
     }
 
-    public Task<bool> UpdateTaskAsync(int idTask, TaskEntity task)
-    {
-        throw new NotImplementedException();
-    }
+public async Task<bool> UpdateTaskAsync(int idTask, TaskEntity task)
+{
+    var existingTask = await _context.Tasks.FindAsync(idTask);
+    if (existingTask == null) return false;
 
-    public Task<bool> DeleteTaskAsync(int idTask)
-    {
-        throw new NotImplementedException();
-    }
+    existingTask.Title = task.Title;
+    existingTask.Description = task.Description;
+    existingTask.Completed = task.Completed;
+    existingTask.PriorityId = task.PriorityId;
+    existingTask.UpdatedAt = DateTime.UtcNow;
+
+    await _context.SaveChangesAsync();
+    return true;
+}
+
+public async Task<bool> DeleteTaskAsync(int idTask)
+{
+    var task = await _context.Tasks.FindAsync(idTask);
+    if (task == null) return false;
+
+    // Soft Delete (recomendado) o Hard Delete
+    task.Deleted = true; 
+    task.UpdatedAt = DateTime.UtcNow;
+
+    await _context.SaveChangesAsync();
+    return true;
+}
 }
