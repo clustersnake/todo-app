@@ -1,0 +1,14 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=server;Port=1234;Database=postgres;User Id=postgres;Password=password;SSL Mode=Require;Trust Server Certificate=true;No Reset On Close=true;Multiplexing=false"
+  },
+  "ApiKeySettings": {
+    "ApiKey": "secret key"
+  }
+}
