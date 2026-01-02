@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Todo.Application.Interfaces;
 using Todo.Domain.Entities;
 
 
 namespace Todo.Infrastructure.Data;
 
-public class ApplicationDbContext : DbContext {
+public class ApplicationDbContext : DbContext, IApplicationDbContext {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
     public DbSet<UserEntity> Users { get; set; }
