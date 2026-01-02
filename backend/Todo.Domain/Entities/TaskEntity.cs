@@ -6,7 +6,7 @@ public class TaskEntity
     
     // Relación con Usuario
     public int UserId { get; set; }
-    public virtual UserEntity User { get; set; } = null!;
+    public virtual UserEntity? User { get; set; } = null!;
 
     public required string Title { get; set; }
     public string? Description { get; set; }
@@ -19,7 +19,7 @@ public class TaskEntity
 
     // Relación con Prioridad
     public int PriorityId { get; set; }
-    public virtual PriorityEntity Priority { get; set; } = null!;
+    public virtual PriorityEntity? Priority { get; set; } = null!;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
