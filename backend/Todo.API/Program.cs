@@ -24,6 +24,16 @@ builder.Services.AddHttpClient<UserSyncService>();
 
 builder.Services.AddControllers();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // La URL de tu Vite
+              .AllowAnyMethod()
+              .AllowAnyHeader(); // Crucial para que permita el header X-Api-Key [cite: 2025-12-30]
+    });
+});
+
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -40,6 +50,8 @@ if (app.Environment.IsDevelopment())
     });
     
 }
+app.UseCors("AllowReactApp");
+
 app.UseMiddleware<Todo.API.Middleware.ApiKeyMiddleware>();
 
 if (!app.Environment.IsDevelopment())
