@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Todo.Infrastructure.Data;
 using Todo.Infrastructure.ExternalServices;
+using Todo.Application.Interfaces;
+using Todo.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,15 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+
+
+builder.Services.AddScoped<IApplicationDbContext>(provider =>
+    provider.GetRequiredService<ApplicationDbContext>());
+
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddHttpClient<UserSyncService>();
+
 builder.Services.AddControllers();
 
 
@@ -18,18 +29,18 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddHttpClient<UserSyncService>();
-
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options => {
+        options.SwaggerEndpoint("/openapi/v1.json", "v1");
+    });
+    
 }
-
-app.MapControllers();
+app.UseMiddleware<Todo.API.Middleware.ApiKeyMiddleware>();
 
 if (!app.Environment.IsDevelopment())
 {
@@ -37,6 +48,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 
+app.MapControllers();
 
 app.Run();
 
